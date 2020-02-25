@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+This is my cool game!<br>
+<h1 id=score>Deaths: 0</h1>
+<!--death count called score-->
+
+<script>
+  window.onload = function() {
+    const startingX = 45;
+    const startingY = 350;
+    const startingRad = 28;
+    let x = startingX;
+    let y = startingY;
+    let r = startingRad;
+    let score = 0;
+    const canvasWidth = 500;
+    const canvasHeight = 400;
+    const radMax = 36;
+    const radMin = 22;
+    const walls = [
+      {
+        x: 50,
+        y: 100,
+        width: 400,
+        height: 10,
+      },
+      {
+        x: 0,
+        y: 300,
+        width: 300,
+        height: 10,
+      },
+      {
+        x: 400,
+        y: 200,
+        width: 10,
+        height: 300,
+      },
+      {
+        x: 400,
+        y: 200,
+        width: 100,
+        height: 10,
+      },
+      {
+        x: 290,
+        y: 100,
+        width: 10,
+        height: 200,
+      },
+      {
+        x: 0,
+        y: 200,
+        width: 235,
+        height: 10,
+      },
+      {
+        x: 0,
+        y: 0,
+        width: 500,
+        height: 30,
+      },
+    ]
+
+    const canvasElement = document.createElement('canvas');
+    canvasElement.width = canvasWidth;
+    canvasElement.height = canvasHeight;
+    canvasElement.style.width = canvasWidth;
+    canvasElement.style.height = canvasHeight;
+    canvasElement.style.border = "1px solid black";
+    document.body.appendChild(canvasElement);
+
+    // Get the 2D context for the canvas:
+    var ctx=canvasElement.getContext("2d");
+
+    // return true if the rectangle and circle are colliding
+    function intersects(w,xpos,ypos,rad) {
+      var distX = Math.abs(xpos - w.x-w.width/2);
+      var distY = Math.abs(ypos - w.y-w.height/2);
+
+      if (distX > (w.width/2 + rad)) { return false; }
+      if (distY > (w.height/2 + rad)) { return false; }
+
+      if (distX <= (w.width/2)) { return true; }
+      if (distY <= (w.height/2)) { return true; }
+
+      var dx=distX-w.width/2;
+      var dy=distY-w.height/2;
+      return (dx*dx+dy*dy<=(rad*rad));
+
+    }
+
+    function draw(xpos,ypos,rad,circleColor) {
+      //console.log(`${xpos},${ypos} r=${rad}`);
+
+      ctx.fillStyle="black";
+      ctx.fillRect(0,0,canvasWidth,canvasHeight);
+
+      ctx.beginPath()
+      ctx.strokeStyle=circleColor;
+      ctx.lineWidth=5;
+      ctx.arc(xpos,ypos,rad,0,2*Math.PI);
+      ctx.stroke();
+      ctx.fill();
+
+      ctx.fillStyle="lime";
+      ctx.font=`${rad/2+3}px Arial`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("Keaton",xpos-1,ypos+1);
+
+      walls.forEach(function(w) {
+        ctx.fillStyle="grey";
+        ctx.fillRect(w.x, w.y, w.width, w.height);
+      });
+
+      document.getElementById("score").textContent =
+           `Deaths: ${score}`;
+    }
+
+    let speed = 10;
+    let way = "still";
+    let spacePress = false;
+
+    function gogogo(){
+      let inter = false;
+      walls.forEach(function(w){
+        inter = inter || intersects(w,x,y,r);
+      });
+      if (inter) {
+        way = "still";
+        x = startingX;
+        y = startingY;
+        r = startingRad;
+        score++;
+
+      }
+      const s = speed * (spacePress ? 0.25 : 0.75);
+      let cc = "blue";
+      switch (way) {
+        case "still":
+          cc = "white";
+          break;
+        case "up":
+          y = y - s;
+          break;
+        case "down":
+          y = y + s;
+          break;
+        case "left":
+          x = x - s;
+          break;
+        case "right":
+          x = x + s;
+          break;
+        }
+        if (y < r){
+         y = r;
+        }
+        if (y > (canvasHeight-r)){
+         y = (canvasHeight-r);
+        }
+        if (x < r){
+         x = r;
+        }
+        if (x > (canvasWidth-r)){
+         x = (canvasWidth-r);
+        }
+        if (r > (radMax)){
+         r = (radMax);
+        }
+        if (r < (radMin)){
+         r = (radMin);
+        }
+        draw(x,y,r,cc);
+        window.requestAnimationFrame(gogogo);
+    }
+
+    window.requestAnimationFrame(gogogo);
+
+    window.addEventListener('keyup',function(e) {
+      switch (e.key) {
+        case " ":
+          spacePress = false;
+          break;
+          default:way="still";
+        }
+    });
+
+    window.addEventListener('keydown',function(e) {
+      speed = e.shiftKey ? 10 : 5;
+      switch (e.key) {
+        case " ":
+          spacePress = true;
+          break;
+        case "w":
+        case "W":
+        case "ArrowUp":
+          way="up";
+          break;
+        case "s":
+        case "S":
+        case "ArrowDown":
+          way="down";
+          break;
+        case "a":
+        case "A":
+        case "ArrowLeft":
+          way="left";
+           break;
+        case "d":
+        case "D":
+        case "ArrowRight":
+          way="right";
+           break;
+
+        case "m": r = r + 2; break;
+        case "n": r = r - 2; break;
+       }
+    });
+
+    draw(x,y,r);
+  }
+</script>
