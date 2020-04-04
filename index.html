@@ -6,61 +6,101 @@ This is my cool game!<br>
 
 <script>
   window.onload = function() {
+    var levelNum = 0;
+    //always reset to zero not one!!!!
+    var currentLevel = level(levelNum);
     const startingX = 45;
     const startingY = 350;
     const startingRad = 28;
-    let x = startingX;
-    let y = startingY;
-    let r = startingRad;
-    let score = 0;
+    var x = startingX;
+    var y = startingY;
+    var r = startingRad;
+    var score = 0;
     const canvasWidth = 500;
     const canvasHeight = 400;
     const radMax = 36;
     const radMin = 22;
-    const walls = [
-      {
-        x: 50,
-        y: 100,
-        width: 400,
-        height: 10,
-      },
-      {
-        x: 0,
-        y: 300,
-        width: 300,
-        height: 10,
-      },
-      {
-        x: 400,
-        y: 200,
-        width: 10,
-        height: 300,
-      },
-      {
-        x: 400,
-        y: 200,
-        width: 100,
-        height: 10,
-      },
-      {
-        x: 290,
-        y: 100,
-        width: 10,
-        height: 200,
-      },
-      {
-        x: 0,
-        y: 200,
-        width: 235,
-        height: 10,
-      },
-      {
-        x: 0,
-        y: 0,
-        width: 500,
-        height: 30,
-      },
-    ]
+
+    function wall(x,y,w,h){
+      const newWall = {
+        x: x,
+        y: y,
+        width: w,
+        height: h,
+      };
+      return newWall;
+    }
+
+    function level(n){
+      var newLevel;
+      switch (n) {
+        case 0:
+           newLevel = {
+             name: `Keaton's Fantastic Level ${n}`,
+             goal: wall(20,240,30, 30),
+             walls: [
+               //wall(XX,XX,XX,XX),
+               wall(50 ,100,400,10),
+               wall(0  ,300,300,10),
+               wall(400,200,10 ,300),
+               wall(400,200,100,10),
+               wall(290,100,10 ,200),
+               wall(0  ,200,235,10),
+               wall(0  ,0  ,500,30),
+               wall(230,200,10 ,50),
+             ],
+           }
+           break;
+          case 1:
+            newLevel = {
+              name: `Keaton's Fantastic Level ${n}`,
+              goal: wall(250,200,50,50),
+              walls: [
+                //wall(XX,XX,XX,XX),
+                wall(50 ,50 ,10 ,250),
+                wall(50 ,300,50 ,10),
+                wall(100,300,10 ,110),
+                wall(50 ,50 ,400,10),
+                wall(440,50 ,10 ,300),
+                wall(160,340,290,10),
+                wall(160,240,10 ,100),
+                wall(110,240,50 ,10),
+                wall(50 ,180,400,10),
+                wall(230,190,10 ,70),
+                wall(230,260,150,10),
+              ],
+
+            }
+            break;
+           case 2:
+             newLevel = {
+               name: `Keaton's Fantastic Level ${n}`,
+               goal: wall(420,10,70,70),
+               walls: [
+                 wall(100,50 ,10 ,350),
+                 wall(160,0  ,10 ,350),
+                 wall(220,0  ,10 ,150),
+                 wall(220,205,10 ,200),
+                 wall(220,140,60 ,10),
+                 wall(280,0  ,10 ,350),
+                 wall(340,50 ,10 ,350),
+                 wall(400,0  ,10 ,350),
+
+               ],
+             }
+             break;
+            case 3:
+             newLevel = {
+               name: `Keaton's Fantastic Level ${n}`,
+               walls: [
+                 wall(400,0  ,10 ,350),
+               ]
+             }
+        default:
+          console.error(`Invalid level ${n}`);
+      }
+      return newLevel;
+    }
 
     const canvasElement = document.createElement('canvas');
     canvasElement.width = canvasWidth;
@@ -109,24 +149,43 @@ This is my cool game!<br>
       ctx.textBaseline = "middle";
       ctx.fillText("Keaton",xpos-1,ypos+1);
 
-      walls.forEach(function(w) {
+      currentLevel.walls.forEach(function(w) {
         ctx.fillStyle="grey";
         ctx.fillRect(w.x, w.y, w.width, w.height);
       });
+
+      ctx.fillStyle="purple";
+      ctx.fillRect(currentLevel.goal.x,
+        currentLevel.goal.y,
+        currentLevel.goal.width,
+        currentLevel.goal.height);
 
       document.getElementById("score").textContent =
            `Deaths: ${score}`;
     }
 
-    let speed = 10;
-    let way = "still";
-    let spacePress = false;
+    var speed = 10;
+    var way = "still";
+    var spacePress = false;
 
     function gogogo(){
-      let inter = false;
-      walls.forEach(function(w){
+
+      var inter = false;
+      currentLevel.walls.forEach(function(w){
         inter = inter || intersects(w,x,y,r);
+
       });
+
+      if (intersects(currentLevel.goal,x,y,r)) {
+        levelNum++;
+        currentLevel = level(levelNum);
+        way = "still";
+        x = startingX;
+        y = startingY;
+        r = startingRad;
+      }
+
+
       if (inter) {
         way = "still";
         x = startingX;
@@ -136,7 +195,7 @@ This is my cool game!<br>
 
       }
       const s = speed * (spacePress ? 0.25 : 0.75);
-      let cc = "blue";
+      var cc = "blue";
       switch (way) {
         case "still":
           cc = "white";
