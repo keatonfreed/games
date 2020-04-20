@@ -2,8 +2,47 @@
 
 This is my cool game!<br>
 <h1 id=name></h1>
-<h2 id=level>level:</h2>
-<h2 id=deaths>Deaths: 0</h2>
+<h2 id=level class="texteffect">level:</h2>
+<h2 id=deaths class="texteffect">Deaths: 0</h2>
+
+<style>
+@keyframes text-shadow-keaton {
+    1% {
+        transform: translateY(0);
+        text-shadow:
+            0 0 0 #363232,
+            0 0 0 #2e2a2a,
+            0 0 0 #363232,
+            0 0 0 #2e2a2a;
+    }
+
+    40% {
+        transform: translateY(-1em);
+        text-shadow:
+            0 0.125em 0 #363232,
+            0 0.25em 0 #2e2a2a,
+            0 -0.125em 0 #363232,
+            0 -0.25em 0 #2e2a2a;
+    }
+
+    80% {
+        transform: translateY(0.5em);
+        text-shadow:
+            0 -0.0625em 0 #363232,
+            0 -0.125em 0 #2e2a2a,
+            0 0.0625em 0 #363232,
+            0 0.125em 0 #2e2a2a;
+    }
+}
+.texteffect {
+  animation: text-shadow-keaton .5s ease-in-out 1;
+}
+#deaths, #level {
+  font-size: 2em;
+  font-weight: 100;
+  line-height: 1;
+}
+</style>
 
 <script>
   window.onload = function() {
@@ -47,6 +86,7 @@ This is my cool game!<br>
 
     function level(n) {
       const allLevels = [{
+          isTutorial: true,
           name: `tutorial`,
           goal: wall(140, 280, 15, 60),
           text: [
@@ -187,8 +227,13 @@ This is my cool game!<br>
         currentLevel.goal.width,
         currentLevel.goal.height);
 
-      document.getElementById("level").textContent =
-        `Level: ${levelNum}`;
+      if (currentLevel.isTutorial) {
+        document.getElementById("level").textContent =
+          ``;
+      } else {
+        document.getElementById("level").textContent =
+          `Level: ${levelNum}`;
+      }
       document.getElementById("name").textContent =
         `Name: ${currentLevel.name} `;
       document.getElementById("deaths").textContent =
@@ -205,6 +250,13 @@ This is my cool game!<br>
 
     }
 
+    function shadowUpDown(id) {
+      const obj = document.getElementById(id);
+      obj.classList.remove("texteffect");
+      obj.offsetWidth; // refresh
+      obj.classList.add("texteffect");
+    }
+
     var speed = 10;
     var way = "still";
     var spacePress = false;
@@ -218,12 +270,14 @@ This is my cool game!<br>
       });
 
       if (intersects(currentLevel.goal, x, y, r)) {
+        // You win!
         levelNum++;
         currentLevel = level(levelNum);
         way = "still";
         x = startingX;
         y = startingY;
         r = startingRad;
+        shadowUpDown("level");
       }
 
 
@@ -233,6 +287,7 @@ This is my cool game!<br>
         y = startingY;
         r = startingRad;
         deaths++;
+        shadowUpDown("deaths");
 
       }
       const s = speed * (spacePress ? 0.25 : 0.75);
