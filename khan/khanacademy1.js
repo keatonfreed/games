@@ -13,11 +13,6 @@
   document.body.appendChild(canvasElement);
   var ctx = canvasElement.getContext("2d");
 
-  requestAnimationFrame(function raf() {
-    draw();
-    requestAnimationFrame(raf);
-  });
-
   function background(r,g,b) {
     fill(r,g,b);
     rect(0, 0, width, height);
@@ -69,8 +64,36 @@
     ctx.stroke();
     ctx.fill();
   }
-  window.addEventListener('click',e => {
-    mouseX = e.offsetX;
-    mouseY = e.offsetY;
-    mouseClicked();
-  });
+  function pushMatrix() {
+    ctx.save();
+  }
+  function popMatrix() {
+    ctx.restore();
+  }
+  function translate(x,y) {
+    ctx.translate(x,y);
+  }
+  function rotate(r) {
+    ctx.rotate(r);
+  }
+  function triangle(x1,y1,x2,y2,x3,y3) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.lineTo(x3, y3);
+    ctx.fill();
+  }
+  function textAlign(leftRight,topBottom) {
+    ctx.textAlign = leftRight;
+    ctx.textBaseline = topBottom;
+  }
+  const CENTER = "center";
+  const TOP = "top";
+  
+  const startTime = (new Date()).getTime();
+  function millis() {
+    return (new Date()).getTime()-startTime;
+  }
+  function abs(x) {
+    return Math.abs(x);
+  }

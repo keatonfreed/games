@@ -1,9 +1,10 @@
-
+var badTreeChop = false;
 var treeX = 170;
 var axeNumber = 0;
 var axeRotation = 0;
 var axeDirection = true;
-var axechop = false;
+var treechopstate = 0;
+var lastTreeChopStateChange = 0;
 var axePerfect = false;
 var axeX;
 var axeY;
@@ -11,27 +12,56 @@ var treeRot = 0;
 var treeSpeed = 0;
 function tree() {
     pushMatrix();
-    if (axechop) {
-        translate(250,600);
-        treeSpeed += Math.random()*0.5-0.25;
-        treeRot += treeSpeed;
-        if (abs(treeSpeed)>5 || abs(treeRot)>3) {
-            treeSpeed = 0;
-        }
-        treeRot = Math.max(-3,Math.min(3,treeRot));
-        rotate(treeRot);
-        translate(-250,-600);
+    var drawthetree=true;
+    switch (treechopstate) {
+        case 0: break; // Do nothing
+        case 1:
+            translate(250,600);
+            treeSpeed += Math.random()*0.5-0.25;
+            treeRot += treeSpeed;
+            if (abs(treeSpeed)>5 || abs(treeRot)>3) {
+                treeSpeed = 0;
+            }
+            treeRot = Math.max(-3,Math.min(3,treeRot));
+            rotate(treeRot);
+            translate(-250,-600);
+            if (millis() - lastTreeChopStateChange > 3000) {
+                treechopstate = 2;
+                lastTreeChopStateChange = millis();
+            }
+            break;
+        case 2:
+            translate(250,600);
+            treeSpeed = 1;
+            treeRot += treeSpeed;
+            treeRot = Math.min(90,treeRot);
+            rotate(treeRot);
+            translate(-250,-600);
+
+            if (millis() - lastTreeChopStateChange > 3000) {
+                treechopstate = 3;
+                lastTreeChopStateChange = millis();
+            }
+            break;
+        case 3:
+            drawthetree=false;
+            break;
+        default:
     }
-    fill(56, 44, 44);
-    rect(200,250,81,350,20);
+    if (drawthetree) {
+        fill(56, 44, 40);
+        rect(200,250,81,350,20);
+        fill(20, 138, 14);
+        ellipse(236,275,200,200);
+    }
     popMatrix();
 }
 tree();
 draw = function() {
     background(255, 255, 255);
     tree();
-    
-    if (!axechop) {
+
+    if (treechopstate === 0) {
         axeX = mouseX;
         axeY = 500;
         if (axeX >= treeX){
@@ -45,7 +75,7 @@ draw = function() {
     pushMatrix();
     translate(axeX,axeY);
     rotate(axeRotation);
-    if (axechop === true) {
+    if (treechopstate === 1) {
         axeRotation += axeDirection ? 1 : -1;
         if (axeRotation > 10) {
             axeDirection = false;
@@ -72,7 +102,7 @@ draw = function() {
         default: println('Error!');
     }
     popMatrix();
-    
+
     // check axe location
     var axeMessage;
     var distanceToTree = treeX - axeX;
@@ -105,9 +135,15 @@ draw = function() {
 };
 
 mouseClicked = function() {
-    if (axePerfect){
-        axechop = true;
+    if (axePerfect && treechopstate === 0) {
+        treechopstate = 1;
+        lastTreeChopStateChange = millis();
+
     }
+         if (!axePerfect) {
+        badTreeChop = true;
+    }
+
+
+
 };
-
-
