@@ -74,6 +74,7 @@
     ctx.translate(x,y);
   }
   function rotate(r) {
+    // Degrees
     ctx.rotate(r);
   }
   function triangle(x1,y1,x2,y2,x3,y3) {
@@ -89,7 +90,7 @@
   }
   const CENTER = "center";
   const TOP = "top";
-  
+
   const startTime = (new Date()).getTime();
   function millis() {
     return (new Date()).getTime()-startTime;
