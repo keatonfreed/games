@@ -1,4 +1,4 @@
-var numCars = 7;
+var numCars = 6;
 var roadHeight = 40;
 var yellowHeight = 7/40*roadHeight;
 var yellowWidth = 20/40*roadHeight;
