@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ $# -lt 1 ]; then
+  echo "versionSave Your commit message here"
+  exit 1
+fi
+
+cd /Users/keatonfreed/Documents/games
+git add *
+git commit -a -m "$*"
+
