@@ -13,5 +13,7 @@
   },100);
 
   window.addEventListener('click',e => {
-    mouseClicked();
+    if (mouseClicked) {
+      mouseClicked();
+    }
   });

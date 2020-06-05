@@ -1,8 +1,8 @@
 
-var game = 2;
+var game = 1;
 switch(game){
 case 1:
-    {var jackpotTime = 0;
+{var jackpotTime = 0;
 var arrowActive = true;
 var restart = false;
 var arrowX;
@@ -209,6 +209,6 @@ pauseStarted = millis();
     default:
     println("invalid game number");
 }
-draw= function() {
+// draw= function() {
 
-};
+// };

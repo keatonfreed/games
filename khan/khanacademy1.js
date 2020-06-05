@@ -1,5 +1,5 @@
-  const width = 600;
-  const height = 600;
+  var width = width || 600;
+  var height = height || 600;
 
   var mouseX = 0;
   var mouseY = 0;
@@ -21,8 +21,17 @@
   function noStroke() {
     ctx.strokeStyle = "rgba(1, 1, 1, 0)";
   }
+  function stroke(r,g,b) {
+    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 1)`;
+  }
+  function strokeWeight(n) {
+    ctx.strokeWeight = n;
+  }
   function fill(r,g,b) {
     ctx.fillStyle = `rgb(${r},${g},${b})`;
+  }
+  function noFill() {
+    ctx.fillStyle = "rgba(1, 1, 1, 0)";
   }
   function mod(x,n) {
       return ((x%n)+n)%n;
@@ -34,17 +43,11 @@
     ctx.ellipse(x, y, w/2, h/2, 0, Math.min(startAngle, endAngle), Math.max(startAngle,endAngle));
     ctx.fill();
   }
-  function ellipse(x,y,w,h) {
-    arc(x,y,w,h,0,360);
-  }
-  function textSize(s) {
-    ctx.font = `${s}px Arial`;
-  }
-  function text(t,x,y) {
-    ctx.fillText(t, x, y);
-  }
-  function println(t) {
-    console.log(t);
+  function line(x1,y1,x2,y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
   }
   function rect(x, y, width, height, radius) {
     if (typeof radius === "undefined") {
@@ -63,6 +66,30 @@
     ctx.closePath();
     ctx.stroke();
     ctx.fill();
+  }
+  function tan(deg) {
+    return Math.tan(deg*Math.PI/180);
+  }
+  function cos(deg) {
+    return Math.cos(deg*Math.PI/180);
+  }
+  function sin(deg) {
+    return Math.sin(deg*Math.PI/180);
+  }
+  function sqrt(x) {
+    return Math.sqrt(x);
+  }
+  function ellipse(x,y,w,h) {
+    arc(x,y,w,h,0,360);
+  }
+  function textSize(s) {
+    ctx.font = `${s}px Arial`;
+  }
+  function text(t,x,y) {
+    ctx.fillText(t, x, y);
+  }
+  function println(t) {
+    console.log(t);
   }
   function pushMatrix() {
     ctx.save();
