@@ -1,3 +1,4 @@
+noStroke();
 var badTreeChop = false;
 var treeX = 170;
 var axeNumber = 0;
@@ -10,12 +11,21 @@ var axeX;
 var axeY;
 var treeRot = 0;
 var treeSpeed = 0;
+ var cloud1 = 20;
+var cloud2 = 225;
+var cloud3 = 80;
+var cloud4 = -180;
+var downY = 450;
+var logNum = 30;
+var woodY = 550;
+var treeStage = 'sapling';
+var lastTreeStageTime = 0;
 function tree() {
     pushMatrix();
     var drawthetree=true;
     switch (treechopstate) {
         case 0: break; // Do nothing
-        case 1:
+        case 1:{
             translate(250,600);
             treeSpeed += Math.random()*0.5-0.25;
             treeRot += treeSpeed;
@@ -29,8 +39,8 @@ function tree() {
                 treechopstate = 2;
                 lastTreeChopStateChange = millis();
             }
-            break;
-        case 2:
+            break;}
+        case 2:{
             translate(250,600);
             treeSpeed = 1;
             treeRot += treeSpeed;
@@ -38,38 +48,154 @@ function tree() {
             rotate(treeRot);
             translate(-250,-600);
 
-            if (millis() - lastTreeChopStateChange > 3000) {
+            if (millis() - lastTreeChopStateChange > 2000) {
                 treechopstate = 3;
                 lastTreeChopStateChange = millis();
             }
-            break;
-        case 3:
+            break;}
+        case 3:{
             drawthetree=false;
-            break;
+            break;}
         default:
     }
     if (drawthetree) {
+        switch(treeStage){
+        case'sapling':{
+            fill(56, 44, 40);
+            rect(260,500,10,50,2);
+            noFill();
+            stroke(56, 44, 40);
+            arc(295,500,60,40,180,270);
+            arc(237.5,500,55,60,260,360);
+            arc(247.5,540,35,60,260,360);
+           noStroke();
+           fill(20, 138, 14);
+           rotate(25);
+           ellipse(434,366,10,20);
+           rotate(-35);
+           rotate(-25);
+           ellipse(-32,568,10,20);
+           rotate(35);
+           rotate(-20);
+           ellipse(58,528,10,20);
+           rotate(20);
+           rotate(25);
+           ellipse(408,335,10,20);
+           rotate(-25);
+
+if (millis() - lastTreeStageTime === 3000) {
+treeStage = 'halfgrown';
+lastTreeStageTime = millis();
+           }
+            break;}
+        case'halfgrown':{
+
+            fill(56, 44, 40);
+            rect(260,350,50,200,2);
+            fill(20, 138, 14);
+        ellipse(290,290,80,90);
+        ellipse(270,335,100,80);
+        ellipse(310,335,90,70);
+
+            if (millis() - lastTreeStageTime > 3000) {
+treeStage = 'full';
+lastTreeStageTime = millis();}
+        break;
+
+        }
+        case'full':{
         fill(56, 44, 40);
-        rect(200,250,81,350,20);
+        rect(200,200,81,350,20);
         fill(20, 138, 14);
-        ellipse(236,275,200,200);
+        ellipse(236,225,200,200);
+        break;}
+        }
     }
     popMatrix();
 }
 tree();
 draw = function() {
     background(255, 255, 255);
+
+   println(millis());
+
+     cloud1 += 0.5;//small cloud move
+    if (cloud1 > 450) {
+        cloud1 = -100;
+    }
+    cloud2 += 0.6;//big cloud move
+    if (cloud2 > 450) {
+        cloud2 = -150;
+    }
+     cloud3 += 0.3;//small cloud move
+    if (cloud3 > 450) {
+        cloud3 = -150;
+    }
+     cloud4 += 0.5;//small cloud move
+    if (cloud4 > 450) {
+        cloud4 = -130;
+    }
+
+
+    background(215, 255, 255);
+
+    //sun
+    fill(255, 255, 0);
+    arc(200, 60, 100, 100, -90, 90);
+    fill(255, 240, 0);
+    arc(200, 60, 100, 100, 90, 270);
+
+    //clouds
+    fill(255, 255, 255);
+    rect(cloud1, 45, 100, 25, 40);
+    rect(cloud2, 75, 155, 40, 40);
+    rect(cloud3, 151,149, 50, 40);
+    rect(cloud4, 131,136, 27, 40);
+
+    //ground
+    fill(80, 255, 75);
+    rect(0, 550, 600, 60);
+
     tree();
 
+    //chest
+    noStroke();
+fill(135, 52, 7);
+rect(250,50,100,50);
+arc(300,50,100,70,181,360);
+
+fill(207, 146, 15);
+rect(340,50,10,50);
+rect(250,50,10,50);
+rect(250,50,100,8);
+rect(250,90,100,10);
+rect(292,50,15,25);
+
+fill(0, 0, 0);
+ellipse(300,69,5.5,5.5);
+triangle(297.5,57,302.5,57,300,70);
+
+noFill();
+stroke(207, 146, 15);
+strokeWeight(9.5);
+arc(300,50,90,70,181,360);
+    noStroke();
+
+
+
     if (treechopstate === 0) {
-        axeX = mouseX;
-        axeY = 500;
+        axeX = mouseX-15;
+        axeY = 450;
         if (axeX >= treeX){
             axeX = treeX;
         }
         if (axeX <= treeX-150) {
             axeX = treeX-150;
         }
+    }
+    if (treechopstate === 2) {
+        axeY = downY;
+        downY+=2.5;
     }
     // draw axe
     pushMatrix();
@@ -129,13 +255,31 @@ draw = function() {
         axeMessage = "PERFECT!";
         axePerfect = true;
     }
-
+if (treechopstate === 0 || treechopstate === 1) {
     textAlign(CENTER, TOP);
     text(axeMessage,axeX+18,axeY+20);
+}
+if (treechopstate === 3) {
+if(woodY>50) {
+fill(125, 77, 15);
+
+
+for(var woodX = 330; woodX>330-logNum;woodX--){
+    stroke(0, 0, 0);
+    strokeWeight(0.4);
+ellipse(woodX-13,woodY,32.5,36);
+ellipse(woodX+13,woodY,32.5,35);
+ellipse(woodX,woodY-25,32.5,35);
+noStroke();
+}
+
+woodY-=7.5;
+}
+}
 };
 
 mouseClicked = function() {
-    if (axePerfect && treechopstate === 0) {
+    if (axePerfect && treechopstate === 0 && treeStage === 'full') {
         treechopstate = 1;
         lastTreeChopStateChange = millis();
 
@@ -143,7 +287,9 @@ mouseClicked = function() {
          if (!axePerfect) {
         badTreeChop = true;
     }
-
+    if(mouseX < 20, mouseY <20) {
+        treechopstate = 0;
+    }
 
 
 };
