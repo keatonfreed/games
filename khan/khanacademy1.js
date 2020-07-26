@@ -25,7 +25,7 @@
     ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 1)`;
   }
   function strokeWeight(n) {
-    ctx.strokeWeight = n;
+    ctx.lineWidth = n;
   }
   function fill(r,g,b) {
     ctx.fillStyle = `rgb(${r},${g},${b})`;
@@ -42,6 +42,7 @@
     ctx.beginPath();
     ctx.ellipse(x, y, w/2, h/2, 0, Math.min(startAngle, endAngle), Math.max(startAngle,endAngle));
     ctx.fill();
+    ctx.stroke();
   }
   function line(x1,y1,x2,y2) {
     ctx.beginPath();
@@ -53,6 +54,8 @@
     if (typeof radius === "undefined") {
       radius = 0;
     }
+    let minDim = Math.min(width,height);
+    radius = Math.min(radius,minDim/2);
     ctx.beginPath();
     ctx.moveTo(x + radius, y);
     ctx.lineTo(x + width - radius, y);
@@ -82,11 +85,15 @@
   function ellipse(x,y,w,h) {
     arc(x,y,w,h,0,360);
   }
+  var _lineheight = 15;
   function textSize(s) {
     ctx.font = `${s}px Arial`;
+    _lineheight = s;
   }
-  function text(t,x,y) {
-    ctx.fillText(t, x, y);
+  function text(txt,x,y) {
+    let lines = txt.split('\n');
+    for (var i = 0; i<lines.length; i++)
+       ctx.fillText(lines[i], x, y + (i*_lineheight) );
   }
   function println(t) {
     console.log(t);
@@ -100,9 +107,9 @@
   function translate(x,y) {
     ctx.translate(x,y);
   }
-  function rotate(r) {
+  function rotate(deg) {
     // Degrees
-    ctx.rotate(r);
+    ctx.rotate(deg * Math.PI / 180);
   }
   function triangle(x1,y1,x2,y2,x3,y3) {
     ctx.beginPath();
@@ -124,4 +131,8 @@
   }
   function abs(x) {
     return Math.abs(x);
+  }
+  var _framerate = 60;
+  function framerate(n) {
+    _framerate = n;
   }

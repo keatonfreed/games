@@ -117,7 +117,7 @@ tree();
 draw = function() {
     background(255, 255, 255);
 
-   println(millis());
+//   println(millis());
 
      cloud1 += 0.5;//small cloud move
     if (cloud1 > 450) {
@@ -179,7 +179,7 @@ noFill();
 stroke(207, 146, 15);
 strokeWeight(9.5);
 arc(300,50,90,70,181,360);
-    noStroke();
+noStroke();
 
 
 
