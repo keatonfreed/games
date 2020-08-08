@@ -7,7 +7,7 @@ var axeDirection = true;
 var treechopstate = 'sapling';
 var axePerfect = false;
 var axeX;
-var axeY;
+var axeY = height + 150;
 var treeRot = 0;
 var treeSpeed = 0;
 var cloud1 = 20;
@@ -82,9 +82,15 @@ function drawBackdrop() {
 }
 
 function drawAxe() {
-  if (treechopstate === 'aiming') {
+  if (treechopstate === 'aiming' || treechopstate === 'halfgrown') {
     axeX = mouseX - 15;
-    axeY = 450;
+    if (treechopstate === 'aiming') {
+      axeY = 450;
+    } else if (treechopstate === 'halfgrown') {
+      if (axeY >= 450) {
+        axeY -= 1.75;
+      }
+    }
     if (axeX >= treeX) {
       axeX = treeX;
     }
@@ -199,7 +205,6 @@ function drawTree() {
       ellipse(290, 290, 80, 90);
       ellipse(270, 335, 100, 80);
       ellipse(310, 335, 90, 70);
-
       if (millis() - lastTreeStageTime > 3000) {
         treechopstate = 'aiming';
         lastTreeStageTime = millis();
@@ -281,7 +286,5 @@ mouseClicked = function() {
   if (!axePerfect) {
     badTreeChop = true;
   }
-  if (mouseX < 20, mouseY < 20) {
-    treechopstate = 'aiming';
-  }
+
 };
