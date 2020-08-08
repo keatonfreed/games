@@ -5,7 +5,6 @@ var axeNumber = 0;
 var axeRotation = 0;
 var axeDirection = true;
 var treechopstate = 'sapling';
-var lastTreeChopStateChange = 0;
 var axePerfect = false;
 var axeX;
 var axeY;
@@ -15,7 +14,6 @@ var cloud1 = 20;
 var cloud2 = 225;
 var cloud3 = 80;
 var cloud4 = -180;
-var downY = 450;
 var logNum = 30;
 var woodY = 550;
 var lastTreeStageTime = 0;
@@ -94,8 +92,7 @@ function drawAxe() {
       axeX = treeX - 150;
     }
   } else if (treechopstate === 'falling') {
-    axeY = downY;
-    downY += 2.5;
+    axeY += 2.5;
   }
 
   // draw axe
@@ -222,9 +219,9 @@ function drawTree() {
       treeRot = Math.max(-3, Math.min(3, treeRot));
       rotate(treeRot);
       translate(-250, -600);
-      if (millis() - lastTreeChopStateChange > 3000) {
+      if (millis() - lastTreeStageTime > 3000) {
         treechopstate = 'falling';
-        lastTreeChopStateChange = millis();
+        lastTreeStageTime = millis();
       }
       break;
     case 'falling':
@@ -236,9 +233,9 @@ function drawTree() {
       rotate(treeRot);
       translate(-250, -600);
 
-      if (millis() - lastTreeChopStateChange > 2000) {
+      if (millis() - lastTreeStageTime > 2000) {
         treechopstate = 'collectWood';
-        lastTreeChopStateChange = millis();
+        lastTreeStageTime = millis();
       }
       break;
     case 'collectWood':
@@ -253,7 +250,9 @@ function drawTree() {
       }
       woodY -= 7.5;
       if (woodY < 50) {
+        lastTreeStageTime = millis();
         treechopstate = 'sapling';
+        woodY = 550;
       }
       break;
     default:
@@ -277,7 +276,7 @@ draw = function() {
 mouseClicked = function() {
   if (axePerfect && treechopstate === 'aiming') {
     treechopstate = 'shaking';
-    lastTreeChopStateChange = millis();
+    lastTreeStageTime = millis();
   }
   if (!axePerfect) {
     badTreeChop = true;
