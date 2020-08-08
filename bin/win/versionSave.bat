@@ -4,7 +4,7 @@ IF "%1"=="" GOTO no_args
 
 cd C:\Users\keato\Documents\games
 git add *
-git commit -a -m "$*"
+git commit -a -m "%*"
 GOTO :end
 
 :no_args

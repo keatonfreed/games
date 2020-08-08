@@ -20,6 +20,7 @@ var lastTreeStageTime = 0;
 
 function drawBackdrop() {
   background(255, 255, 255);
+
   cloud1 += 0.5; //small cloud move
   if (cloud1 > 450) {
     cloud1 = -100;
