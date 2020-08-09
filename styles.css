@@ -1,0 +1,82 @@
+h3 {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+  padding-left: 7.5px;
+  list-style-type: none;
+}
+
+.followh {
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.spacer {
+  height: 40px;
+}
+
+.photogroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  animation: 7.5s infinite linear photo-rotate;
+}
+
+.photox {
+  z-index: -1;
+  animation: x 1.5s linear infinite alternate;
+}
+
+.photoy {
+  animation: y 1s linear infinite alternate;
+}
+
+.photox, .photoy {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.photox h1, .photox h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#other_photox {
+  animation-delay: -1s;
+  animation-duration: 2s;
+}
+
+#other_photoy {
+  animation-delay: -1s;
+  animation-duration: 1.7s;
+}
+
+#other_group {
+  animation-duration: 5s;
+}
+
+@keyframes x {
+  100% {
+    transform: translateX(calc(100vw - 450px));
+  }
+}
+
+@keyframes y {
+  100% {
+    transform: translateY(calc(100vh - 450px));
+  }
+}
+
+@keyframes photo-rotate {
+  0% {
+    transform: rotateZ(0) rotatex(0);
+  }
+
+  100% {
+    transform: rotateZ(360deg) rotatex(360deg);
+  }
+}
