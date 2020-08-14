@@ -91,7 +91,7 @@
     _lineheight = s;
   }
   function text(txt,x,y) {
-    let lines = txt.split('\n');
+    let lines = txt.toString().split('\n');
     for (var i = 0; i<lines.length; i++)
        ctx.fillText(lines[i], x, y + (i*_lineheight) );
   }
