@@ -1,4 +1,4 @@
-function calcFPS(a) {
+function _calcFPS(a) {
   function b() {
     if (f--) c(b);
     else {
@@ -15,11 +15,14 @@ function calcFPS(a) {
   b()
 }
 var FPS = 60;
-err = calcFPS({
+err = _calcFPS({
   count: 120,
   callback: fps => {
     FPS = fps;
     console.log(`Detected ${FPS} fps`);
+    if (typeof gotFps !== 'undefined') {
+      gotFps();
+    }
   }
 });
 
@@ -27,14 +30,18 @@ window.addEventListener('mousemove', e => {
   mouseX = e.offsetX;
   mouseY = e.offsetY;
 })
-setTimeout(function raf() {
-  draw();
-  if (Math.abs(_framerate - FPS) < 5) {
-    requestAnimationFrame(raf);
-  } else {
-    setTimeout(raf, 1000 / _framerate);
-  }
-}, 100);
+if (typeof draw !== 'undefined') {
+  setTimeout(function raf() {
+    draw();
+    if (Math.abs(_framerate - FPS) < 5) {
+      requestAnimationFrame(raf);
+    } else {
+      setTimeout(raf, 1000 / _framerate);
+    }
+  }, 100);
+} else {
+  console.log('Warning: no draw() method provided');
+}
 
 window.addEventListener('click', e => {
   if (mouseClicked) {
