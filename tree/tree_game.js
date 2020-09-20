@@ -1,5 +1,4 @@
 noStroke();
-var badTreeChop = false;
 var treeX = 170;
 var axeNumber = 0;
 var axeRotation = 0;
@@ -17,6 +16,7 @@ var cloud4 = -180;
 var logNum = 30;
 var woodY = 550;
 var lastTreeStageTime = 0;
+var woodEarnings = 0;
 
 function drawBackdrop() {
   background(255, 255, 255);
@@ -253,6 +253,9 @@ function drawTree() {
         ellipse(woodX, woodY - 25, 32.5, 35);
         noStroke();
       }
+      fill(0,0,0);
+      textSize(35);
+      text(woodEarnings,woodX+60,woodY-50);
       woodY -= 7.5;
       if (woodY < 50) {
         lastTreeStageTime = millis();
@@ -279,12 +282,19 @@ draw = function() {
 };
 
 mouseClicked = function() {
-  if (axePerfect && treechopstate === 'aiming') {
+  if (treechopstate === 'aiming') {
+
+    if(axePerfect) {
+
+    woodEarnings = 15;
     treechopstate = 'shaking';
     lastTreeStageTime = millis();
-  }
-  if (!axePerfect) {
-    badTreeChop = true;
-  }
+  }else {
+
+    woodEarnings = 5;
+    treechopstate = 'shaking';
+    lastTreeStageTime = millis();
+  }}
+
 
 };
