@@ -47,15 +47,13 @@ function drawIt() {
         // Move to view the 'B', after it starts.
         setCameraScale(8);
         setCameraLocation(30, 330);
-        setCameraLocation(177, 330, 2.7);
-        setCameraScale(1, 4);
       },
-      after: 2700
+      after: 2400
     },
     {
       func: () => {
         // Move to view the 'U', after it starts.
-        setCameraLocation(177, 330);
+        setCameraLocation(177, 330, 0.2);
       },
       after: 200
     },
@@ -64,12 +62,46 @@ function drawIt() {
     {
       func: () => {
         // Move to view the top of the 'I'.
-        setCameraLocation(300, 240);
+        setCameraLocation(300, 240, 0.2);
+      },
+      after: 1000
+    },
+    {
+      func: () => {
+        // Start panning to end location.
+        setCameraLocation(1050, 320, 7.5);
+        setCameraScale(6, 4);
+        //setCameraLocation(0, 0, 0);
+        //setCameraScale(1, 0);
+
+        //draw letters faster
+        drawOne('LDNIT', 3 / 5);
       },
       after: 5000
     },
-    { func: () => drawOne('LDNIT', 0.001), after: 500 },
-    { func: () => drawOne('E'), after: 1000 },
+    {
+      func: () => {
+
+        drawOne('E', 1);
+      },
+      after: 3500
+    },
+    {
+      func: () => {
+        // Zoom and pan back out to see the whole thing.
+        setCameraLocation(0, 0, 2);
+        setCameraScale(1, 2);
+      },
+      after: 2000
+    },
+    {
+      func: () => {
+        // Set exact scale and location.
+        setCameraLocation(0, 0);
+        setCameraScale(1);
+      },
+      after: 0
+    },
   ];
 
   function popone() {
