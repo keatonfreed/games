@@ -299,7 +299,10 @@ function textAlign(leftRight, topBottom) {
   ctx.textBaseline = topBottom;
 }
 const CENTER = "center";
+const LEFT = "left";
+const RIGHT = "right";
 const TOP = "top";
+const BOTTOM = "bottom";
 
 const startTime = (new Date()).getTime();
 

@@ -4,6 +4,7 @@ var axeNumber = 0;
 var axeRotation = 0;
 var axeDirection = true;
 var treechopstate = 'sapling';
+var currentLoc = "forest";
 var axePerfect = false;
 var axeX;
 var axeY = height + 150;
@@ -19,44 +20,51 @@ var lastTreeStageTime = 0;
 var woodEarnings = 0;
 
 function drawBackdrop() {
-  background(255, 255, 255);
+  switch (currentLoc) {
+    case "forest":
+      background(255, 255, 255);
 
-  cloud1 += 0.5; //small cloud move
-  if (cloud1 > 450) {
-    cloud1 = -100;
+      cloud1 += 0.5; //small cloud move
+      if (cloud1 > 450) {
+        cloud1 = -100;
+      }
+      cloud2 += 0.6; //big cloud move
+      if (cloud2 > 450) {
+        cloud2 = -150;
+      }
+      cloud3 += 0.3; //small cloud move
+      if (cloud3 > 450) {
+        cloud3 = -150;
+      }
+      cloud4 += 0.5; //small cloud move
+      if (cloud4 > 450) {
+        cloud4 = -130;
+      }
+
+      background(215, 255, 255);
+
+      //sun
+      fill(255, 255, 0);
+      arc(200, 60, 100, 100, -90, 90);
+      fill(255, 240, 0);
+      arc(200, 60, 100, 100, 90, 270);
+
+      //clouds
+      fill(255, 255, 255);
+      rect(cloud1, 45, 100, 25, 40);
+      rect(cloud2, 75, 155, 40, 40);
+      rect(cloud3, 151, 149, 50, 40);
+      rect(cloud4, 131, 136, 27, 40);
+
+      //ground
+      fill(80, 255, 75);
+      rect(0, 550, 600, 60);
+      break;
+
+    case "cave":
+      background(0, 255, 150);
+      break;
   }
-  cloud2 += 0.6; //big cloud move
-  if (cloud2 > 450) {
-    cloud2 = -150;
-  }
-  cloud3 += 0.3; //small cloud move
-  if (cloud3 > 450) {
-    cloud3 = -150;
-  }
-  cloud4 += 0.5; //small cloud move
-  if (cloud4 > 450) {
-    cloud4 = -130;
-  }
-
-  background(215, 255, 255);
-
-  //sun
-  fill(255, 255, 0);
-  arc(200, 60, 100, 100, -90, 90);
-  fill(255, 240, 0);
-  arc(200, 60, 100, 100, 90, 270);
-
-  //clouds
-  fill(255, 255, 255);
-  rect(cloud1, 45, 100, 25, 40);
-  rect(cloud2, 75, 155, 40, 40);
-  rect(cloud3, 151, 149, 50, 40);
-  rect(cloud4, 131, 136, 27, 40);
-
-  //ground
-  fill(80, 255, 75);
-  rect(0, 550, 600, 60);
-
   //chest
   noStroke();
   fill(135, 52, 7);
@@ -79,6 +87,14 @@ function drawBackdrop() {
   strokeWeight(9.5);
   arc(300, 50, 90, 70, 181, 360);
   noStroke();
+
+  //location button
+  fill(0, 0, 0);
+  rect(540, 5, 50, 50, 5);
+  fill(255, 255, 255);
+  textSize(12);
+  textAlign(LEFT, TOP);
+  text("To Cave", 543, 25);
 }
 
 function drawAxe() {
@@ -295,6 +311,9 @@ mouseClicked = function() {
       treechopstate = 'shaking';
       lastTreeStageTime = millis();
     }
+  }
+  if (mouseX >= 540 && mouseX <= 590 && mouseY >= 5 && mouseY <= 55) {
+    currentLoc = "cave";
   }
 
 
