@@ -253,9 +253,9 @@ function drawTree() {
         ellipse(woodX, woodY - 25, 32.5, 35);
         noStroke();
       }
-      fill(0,0,0);
+      fill(0, 0, 0);
       textSize(35);
-      text(woodEarnings,woodX+60,woodY-50);
+      text(woodEarnings, woodX + 60, woodY - 50);
       woodY -= 7.5;
       if (woodY < 50) {
         lastTreeStageTime = millis();
@@ -284,17 +284,18 @@ draw = function() {
 mouseClicked = function() {
   if (treechopstate === 'aiming') {
 
-    if(axePerfect) {
+    if (axePerfect) {
 
-    woodEarnings = 15;
-    treechopstate = 'shaking';
-    lastTreeStageTime = millis();
-  }else {
+      woodEarnings = 15;
+      treechopstate = 'shaking';
+      lastTreeStageTime = millis();
+    } else {
 
-    woodEarnings = 5;
-    treechopstate = 'shaking';
-    lastTreeStageTime = millis();
-  }}
+      woodEarnings = 5;
+      treechopstate = 'shaking';
+      lastTreeStageTime = millis();
+    }
+  }
 
 
 };

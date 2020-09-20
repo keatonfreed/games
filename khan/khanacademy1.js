@@ -46,7 +46,6 @@ if (cameraEnabled) {
         _cameraY += _cameraLocYPerMs * elapsedMs;
       }
     }
-<<<<<<< HEAD
     // Handle scale transitions
     if (_cameraScaleTransitionLast) {
       const now = millis();
@@ -66,78 +65,6 @@ if (cameraEnabled) {
     requestAnimationFrame(copyCanvas);
   });
 }
-=======
-    let minDim = Math.min(width,height);
-    radius = Math.min(radius,minDim/2);
-    ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.lineTo(x + width - radius, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-    ctx.lineTo(x + width, y + height - radius);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-    ctx.lineTo(x + radius, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-    ctx.lineTo(x, y + radius);
-    ctx.quadraticCurveTo(x, y, x + radius, y);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.fill();
-  }
-  function tan(deg) {
-    return Math.tan(deg*Math.PI/180);
-  }
-  function cos(deg) {
-    return Math.cos(deg*Math.PI/180);
-  }
-  function sin(deg) {
-    return Math.sin(deg*Math.PI/180);
-  }
-  function sqrt(x) {
-    return Math.sqrt(x);
-  }
-  function ellipse(x,y,w,h) {
-    arc(x,y,w,h,0,360);
-  }
-  var _lineheight = 15;
-  function textSize(s) {
-    ctx.font = `${s}px Arial`;
-    _lineheight = s;
-  }
-  function text(txt,x,y) {
-    let lines = txt.toString().split('\n');
-    for (var i = 0; i<lines.length; i++)
-       ctx.fillText(lines[i], x, y + (i*_lineheight) );
-  }
-  function println(t) {
-    console.log(t);
-  }
-  function pushMatrix() {
-    ctx.save();
-  }
-  function popMatrix() {
-    ctx.restore();
-  }
-  function translate(x,y) {
-    ctx.translate(x,y);
-  }
-  function rotate(deg) {
-    // Degrees
-    ctx.rotate(deg * Math.PI / 180);
-  }
-  function triangle(x1,y1,x2,y2,x3,y3) {
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.lineTo(x3, y3);
-    ctx.fill();
-  }
-  function textAlign(leftRight,topBottom) {
-    ctx.textAlign = leftRight;
-    ctx.textBaseline = topBottom;
-  }
-  const CENTER = "center";
-  const TOP = "top";
->>>>>>> e8216eddd190c3fbb66e1f90678b5815bf819c27
 
 function setCameraLocation(x, y, transitionSeconds) {
   console.assert(cameraEnabled, 'To set the camera location, you must set enableCamera to true');
@@ -279,11 +206,10 @@ function textSize(s) {
 }
 
 function text(txt, x, y) {
-  let lines = txt.split('\n');
+  let lines = txt.toString().split('\n');
   for (var i = 0; i < lines.length; i++)
     ctx.fillText(lines[i], x * _canvasScale, y * _canvasScale + (i * _lineheight));
 }
-
 
 function estimateOutlineLength(letter) {
   const metrics = ctx.measureText(letter);
