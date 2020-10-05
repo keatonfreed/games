@@ -22,6 +22,7 @@ const ctxScreen = canvasElement.getContext("2d");
 const _canvasScale = cameraEnabled ? 10 : 1; // Draw things this much larger
 const offscreenCanvas = new OffscreenCanvas(width * _canvasScale, height * _canvasScale);
 const ctx = cameraEnabled ? offscreenCanvas.getContext("2d") : ctxScreen;
+var _background = 'black';
 var _cameraX = 0;
 var _cameraY = 0;
 var _cameraScale = 1;
@@ -57,7 +58,7 @@ if (cameraEnabled) {
         _cameraScale += _cameraScalePerMs * elapsedMs;
       }
     }
-    ctxScreen.fillStyle = 'black';
+    ctxScreen.fillStyle = _background;
     ctxScreen.rect(0, 0, width, height);
     ctxScreen.fill();
     ctxScreen.drawImage(offscreenCanvas, _cameraX, _cameraY, width * _canvasScale / _cameraScale, height * _canvasScale / _cameraScale, 0, 0, width, height);
@@ -97,6 +98,7 @@ function setCameraScale(s, transitionSeconds) {
 function background(r, g, b) {
   fill(r, g, b);
   rect(0, 0, width * _canvasScale, height * _canvasScale);
+  _background = `rgba(${r}, ${g}, ${b}, 0)`
 }
 
 function noStroke() {
@@ -205,10 +207,11 @@ function textSize(s) {
   _setTheFont();
 }
 
-function text(txt, x, y) {
+function text(txt, x, y, nofill) {
+  const textFn = nofill ? ctx.strokeText : ctx.fillText;
   let lines = txt.toString().split('\n');
   for (var i = 0; i < lines.length; i++)
-    ctx.fillText(lines[i], x * _canvasScale, y * _canvasScale + (i * _lineheight));
+    textFn.call(ctx, lines[i], x * _canvasScale, y * _canvasScale + (i * _lineheight));
 }
 
 function estimateOutlineLength(letter) {
