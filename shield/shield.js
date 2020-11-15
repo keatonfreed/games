@@ -13,8 +13,12 @@ function drawPlayer() {
   ellipse(width / 2, height / 2, playerSize, playerSize);
 }
 
+function sum(arr) {
+  return arr.reduce((t, n) => { return t + n }, 0);
+}
+
 function rotatePattern(shieldPattern, shieldShift, cw) {
-  const totalSize = shieldPattern.reduce((t, n) => { t + n }, 0);
+  const totalSize = sum(shieldPattern);
   if (shieldShift >= totalSize) {
     shieldShift = 0;
   }
@@ -67,7 +71,7 @@ let variationDir = true;
 let shieldFuzz = 0;
 let shieldFuzzDir = true;
 const shieldPattern = [20, 5, 5, 5, 20, 7];
-const shieldPatternTotal = shieldPattern.reduce((t, n) => { t + n }, 0);
+const shieldPatternTotal = sum(shieldPattern);
 
 function drawShield() {
   shieldPos += 1;
