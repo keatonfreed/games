@@ -125,6 +125,10 @@ function noFill() {
   ctx.fillStyle = "rgba(1, 1, 1, 0)";
 }
 
+function filter(f) {
+  ctx.filter = f;
+}
+
 function mod(x, n) {
   return ((x % n) + n) % n;
 };

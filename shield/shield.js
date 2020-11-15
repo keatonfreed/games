@@ -1,5 +1,5 @@
 let playerSize = 20;
-let shieldSize = 100;
+let shieldSize = 200;
 
 function draw() {
   background(0, 0, 0);
@@ -13,18 +13,7 @@ function drawPlayer() {
   ellipse(width / 2, height / 2, playerSize, playerSize);
 }
 
-function reversePattern(pattern) {
-  let pat = [];
-  for (let i = pattern.length - 2; i >= 0; i -= 2) {
-    pat = [...pat, pattern[i], pattern[i + 1]];
-  }
-  return pat;
-}
-
 function rotatePattern(shieldPattern, shieldShift, cw) {
-  // if (dir < 0) {
-  //   return reversePattern(rotatePattern(reversePattern(shieldPattern), pos, -dir));
-  // }
   const totalSize = shieldPattern.reduce((t, n) => { t + n }, 0);
   if (shieldShift >= totalSize) {
     shieldShift = 0;
@@ -63,29 +52,43 @@ function rotatePattern(shieldPattern, shieldShift, cw) {
   return pattern;
 }
 
-function drawShieldRing(size, pos, dir, shieldPattern) {
+function drawShieldRing(size, pos, dir, fuzz, shieldPattern) {
   const pattern = rotatePattern(shieldPattern, pos, dir);
   noFill();
   strokeWeight(2);
   lineDash(pattern);
+  filter(`blur(${fuzz}px)`);
   ellipse(width / 2, height / 2, size, size);
 }
 
 let shieldPos = 0;
+let variation = 0;
+let variationDir = true;
+let shieldFuzz = 0;
+let shieldFuzzDir = true;
+const shieldPattern = [20, 5, 5, 5, 20, 7];
+const shieldPatternTotal = shieldPattern.reduce((t, n) => { t + n }, 0);
 
 function drawShield() {
-  const shieldPattern = [20, 5, 5, 5, 20, 7];
-  //  const shieldPattern = [2, 4, 6, 8];
-  if (shieldPos >= shieldPattern.reduce((t, n) => { t + n }, 0)) {
+  shieldPos += 1;
+  if (shieldPos >= shieldPatternTotal) {
     shieldPos = 0;
   }
+  variation += (variationDir ? 1 : -1) * 0.2;
+  if (Math.abs(variation) >= 5) {
+    variationDir = !variationDir;
+  }
+  shieldFuzz += (shieldFuzzDir ? 1 : -1) * 0.05;
+  if (Math.abs(shieldFuzz - 0.5) >= 1) {
+    shieldFuzzDir = !shieldFuzzDir;
+  }
+  let s = shieldSize + variation;
   stroke(255, 0, 0);
-  drawShieldRing(shieldSize, shieldPos, true, shieldPattern);
+  drawShieldRing(s, shieldPos, true, shieldFuzz, shieldPattern);
   stroke(0, 255, 0);
-  drawShieldRing(shieldSize + 5, shieldPos, false, shieldPattern);
+  drawShieldRing(s + 5, shieldPos, false, shieldFuzz, shieldPattern);
   stroke(0, 0, 255);
-  drawShieldRing(shieldSize + 10, shieldPos, true, shieldPattern);
+  drawShieldRing(s + 10, shieldPos, true, shieldFuzz, shieldPattern);
   stroke(255, 255, 255);
-  drawShieldRing(shieldSize + 20, shieldPos, false, shieldPattern);
-  shieldPos += 1;
+  drawShieldRing(s + 20, shieldPos, false, shieldFuzz, shieldPattern);
 }
