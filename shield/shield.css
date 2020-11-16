@@ -3,7 +3,13 @@ h1 {
 }
 
 body {
+  min-height: 100%;
   margin: 20px;
   width: 100vh;
-  height: 100vh;
+  /*  height: 100vh;*/
+}
+
+html {
+  height: 100%;
+  overflow: hidden;
 }
