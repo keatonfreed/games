@@ -30,13 +30,6 @@ class Map {
 
 }
 
-const map = new Map();
-map.addRandomObjects(2500, 2, 0, 0, width * 20, height * 20);
-map.addRandomObjects(100000, 3, 0, 0, width * 20, height * 20);
-
-let myXSpeed = 0;
-let myYSpeed = 0;
-
 class Player {
   #x = 0;
   #y = 0;
@@ -152,6 +145,18 @@ class Player {
     return (x - this.#x) ** 2 + (y - this.#y) ** 2 < (this.#shieldSize ** 2) / 4;
   }
 }
+
+
+
+let myXSpeed = 0;
+let myYSpeed = 0;
+let viewWidth = width;
+let viewHeight = height;
+
+const map = new Map();
+map.addRandomObjects(2500, 2, 0, 0, viewWidth * 20, viewHeight * 20);
+map.addRandomObjects(100000, 3, 0, 0, viewWidth * 20, viewHeight * 20);
+
 const me = new Player();
 
 function draw() {
@@ -162,17 +167,24 @@ function draw() {
   checkCollisions(objectsInZone);
 
   fill(255, 255, 255);
-  textSize(20);
-  text(`${me.x}, ${me.y}`, width - 100, 20);
+  textSize(10);
+  textAlign(RIGHT);
+  // This text always goes at width
+  text(`${me.x}, ${me.y}`, width - 5, 10);
+
+  // if (me.shieldSize > viewWidth * 0.75) {
+  //   viewWidth *= 2;
+  //   viewHeight *= 2;
+  // }
 }
 
 
 function convertToScreenCoords(pt) {
-  return { x: pt.x - me.x + width / 2, y: pt.y - me.y + height / 2 };
+  return { x: pt.x - me.x + viewWidth / 2, y: pt.y - me.y + viewHeight / 2 };
 }
 
 function drawMapZone() {
-  const objectsInZone = map.getObjectsInZone(me.x, me.y, width, height);
+  const objectsInZone = map.getObjectsInZone(me.x, me.y, viewWidth, viewHeight);
   for (const object of objectsInZone) {
     const screenPt = convertToScreenCoords(object);
     switch (object.type) {
@@ -203,7 +215,7 @@ function checkCollisions(objectsInZone) {
     switch (object.type) {
       case 2: // Battery
         if (me.hits(object.x, object.y)) {
-          me.shieldSize += 5;
+          me.shieldSize += 10;
           map.remove(object);
         }
         break;
