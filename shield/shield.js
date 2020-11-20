@@ -224,7 +224,7 @@ function checkCollisions(objectsInZone) {
 }
 
 function movePlayer() {
-  const speed = 10;
+  const speed = 7;
   if (!leftPressed && rightPressed) {
     me.x += speed;
   } else if (leftPressed && !rightPressed) {
