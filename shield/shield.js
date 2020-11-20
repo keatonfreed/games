@@ -1,52 +1,9 @@
-class Map {
-  #map = 0;
-  #id = 0;
-  constructor() {
-    this.#map = [];
-  }
-  // Types:
-  //  0: invalid
-  //  1: player
-  //  2: battery
-  //  3: star
-  addObject(type, x, y) {
-    this.#map.push({ x: x, y: y, type: type, id: this.#id++ });
-  }
-  addRandomObjects(n, type, x, y, w, h) {
-    for (let i = 0; i < n; i++) {
-      this.addObject(type, Math.random() * w + x - w / 2, Math.random() * h + y - h / 2);
-    }
-  }
-  getObjectsInZone(x, y, w, h) {
-    const x1 = x - w / 2;
-    const x2 = x + w / 2;
-    const y1 = y - h / 2;
-    const y2 = y + h / 2;
-    return this.#map.filter(p => { return p.x >= x1 && p.x <= x2 && p.y >= y1 && p.y <= y2 });
-  }
-  remove(obj) {
-    this.#map = this.#map.filter(p => { return p.id != obj.id });
-  }
-
-}
-
-class Player {
-  #x = 0;
-  #y = 0;
-  #playerSize = 20;
-  #shieldSize = 200;
-  #shieldPos = 0;
-  #variation = 0;
-  #variationDir = true;
-  #shieldFuzz = 0;
-  #shieldFuzzDir = true;
-  #shieldPattern = [20, 5, 5, 5, 20, 7];
-  #shieldPatternTotal = 0;
-  constructor(x, y, s) {
+class MapObject {
+  #x = 0
+  #y = 0
+  constructor(x, y) {
     this.#x = x || this.#x;
     this.#y = y || this.#y;
-    this.#shieldSize = s || this.#shieldSize;
-    this.#shieldPatternTotal = sum(this.#shieldPattern);
   }
   get x() {
     return this.#x;
@@ -60,14 +17,68 @@ class Player {
   set y(val) {
     this.#y = val;
   }
+  draw() { throw Error("Not implemented"); }
+  extents() { throw Error("Not implemented"); }
+  intersects(x1, y1, x2, y2) {
+    const [left, top, right, bottom] = this.extents();
+    return left <= x2 && right >= x1 &&
+      top <= y2 && bottom >= y1;
+  }
+}
+
+class Battery extends MapObject {
+  #w = 10;
+  #h = 20;
+  draw() {
+    noStroke();
+    fill(255, 0, 0);
+    const pt = convertToScreenCoords(this);
+    rect(pt.x, pt.y, this.#w, this.#h);
+  }
+  extents() {
+    return [this.x, this.y, this.x + this.#w, this.y + this.#h];
+  }
+}
+
+class Star extends MapObject {
+  #brightness = Math.random() * 255;
+  draw() {
+    noStroke();
+    const b = this.#brightness;
+    fill(b, b, b);
+    this.#brightness += Math.random() * 10 - 5;
+    this.#brightness = Math.max(0, Math.min(255, this.#brightness));
+    const pt = convertToScreenCoords(this);
+    ellipse(pt.x, pt.y, 2, 2);
+  }
+  extents() {
+    return [this.x - 1, this.y - 1, this.x + 1, this.y + 1];
+  }
+}
+
+class Player extends MapObject {
+  #playerSize = 20;
+  #shieldSize = 200; // Diameter!
+  #shieldPos = 0;
+  #variation = 0;
+  #variationDir = true;
+  #shieldFuzz = 0;
+  #shieldFuzzDir = true;
+  #shieldPattern = [20, 5, 5, 5, 20, 7];
+  #shieldPatternTotal = 0;
+  constructor(x, y, s) {
+    super(x, y);
+    this.#shieldSize = s || this.#shieldSize;
+    this.#shieldPatternTotal = sum(this.#shieldPattern);
+  }
   get playerSize() {
     return this.#playerSize;
   }
-  get shieldSize() {
-    return this.#shieldSize;
+  get radius() {
+    return this.#shieldSize / 2;
   }
-  set shieldSize(val) {
-    this.#shieldSize = val;
+  set radius(val) {
+    this.#shieldSize = Math.max(0, val * 2);
   }
 
   rotatePattern(shieldPattern, shieldShift, cw) {
@@ -110,12 +121,15 @@ class Player {
   }
 
   drawShieldRing(size, pos, dir, fuzz, shieldPattern) {
+    if (size <= 0) {
+      return;
+    }
     const pattern = this.rotatePattern(shieldPattern, pos, dir);
     noFill();
     strokeWeight(2);
     lineDash(pattern);
     filter(`blur(${fuzz}px)`);
-    const loc = convertToScreenCoords({ x: this.#x, y: this.#y });
+    const loc = convertToScreenCoords(this);
     ellipse(loc.x, loc.y, size, size);
     filter("none");
     lineDash([]);
@@ -136,17 +150,90 @@ class Player {
     }
     let s = this.#shieldSize + this.#variation;
     stroke(255, 255, 255);
-    this.drawShieldRing(s - 5, this.#shieldPos, true, this.#shieldFuzz, this.#shieldPattern);
+    this.drawShieldRing(s - 10, this.#shieldPos, true, this.#shieldFuzz, this.#shieldPattern);
     stroke(255, 255, 255);
-    this.drawShieldRing(s + 5, this.#shieldPos, false, this.#shieldFuzz, this.#shieldPattern);
+    this.drawShieldRing(s, this.#shieldPos, false, this.#shieldFuzz, this.#shieldPattern);
+  }
+
+  draw() {
+    if (this.radius <= 0) {
+      // DEAD!
+      return;
+    }
+    fill(255, 255, 255);
+    const loc = convertToScreenCoords(this);
+    ellipse(loc.x, loc.y, this.#playerSize, this.#playerSize);
+    this.drawShield();
+  }
+
+  extents() {
+    const r = this.radius;
+    return [this.x - r, this.y - r, this.x + r, this.y + r];
+  }
+
+  intersects(x1, y1, x2, y2) {
+    if (!super.intersects(x1, y1, x2, y2)) {
+      return false;
+    }
+    if ((this.x <= x2 && this.x >= x1) ||
+      (this.y <= y2 && this.y >= y1)) {
+      return true;
+    }
+    return this.hits(x1, y1) ||
+      this.hits(x2, y2) ||
+      this.hits(x2, y1) ||
+      this.hits(x1, y2);
+  }
+
+  checkPlayerInsersection(p2) {
+    if (!this.intersects(...p2.extents())) {
+      return;
+    }
+    const d = Math.sqrt((this.x - p2.x) ** 2 + (this.y - p2.y) ** 2);
+    if (d < (this.radius + p2.radius)) {
+      // Intersection!
+      if (this.radius > p2.radius ||
+        (this.radius == p2.radius && Math.random() > 0.5)) {
+        if (p2.radius > 0) {
+          this.radius += 1;
+          p2.radius = d - this.radius;
+        }
+      }
+    }
   }
 
   hits(x, y) {
-    return (x - this.#x) ** 2 + (y - this.#y) ** 2 < (this.#shieldSize ** 2) / 4;
+    return (x - this.x) ** 2 + (y - this.y) ** 2 < (this.radius ** 2);
   }
 }
 
 
+class Map {
+  #map = 0;
+  constructor() {
+    this.#map = [];
+  }
+  addObject(type, x, y) {
+    const newObj = new type(x, y);
+    this.#map.push(newObj);
+  }
+  addRandomObjects(n, type, x, y, w, h) {
+    for (let i = 0; i < n; i++) {
+      this.addObject(type, Math.random() * w + x - w / 2, Math.random() * h + y - h / 2);
+    }
+  }
+  getObjectsInZone(x, y, w, h) {
+    const x1 = x - w / 2;
+    const x2 = x + w / 2;
+    const y1 = y - h / 2;
+    const y2 = y + h / 2;
+    return this.#map.filter(p => { return p.intersects(x1, y1, x2, y2) });
+  }
+  remove(obj) {
+    this.#map = this.#map.filter(p => { return p != obj });
+  }
+
+}
 
 let myXSpeed = 0;
 let myYSpeed = 0;
@@ -154,15 +241,16 @@ let viewWidth = width;
 let viewHeight = height;
 
 const map = new Map();
-map.addRandomObjects(2500, 2, 0, 0, viewWidth * 20, viewHeight * 20);
-map.addRandomObjects(100000, 3, 0, 0, viewWidth * 20, viewHeight * 20);
+map.addRandomObjects(2500, Battery, 0, 0, viewWidth * 20, viewHeight * 20);
+map.addRandomObjects(100000, Star, 0, 0, viewWidth * 20, viewHeight * 20);
+map.addRandomObjects(1000, Player, 0, 0, viewWidth * 20, viewHeight * 20);
 
 const me = new Player();
 
 function draw() {
   background(0, 0, 0);
   const objectsInZone = drawMapZone();
-  drawPlayer(me);
+  me.draw();
   movePlayer();
   checkCollisions(objectsInZone);
 
@@ -186,39 +274,20 @@ function convertToScreenCoords(pt) {
 function drawMapZone() {
   const objectsInZone = map.getObjectsInZone(me.x, me.y, viewWidth, viewHeight);
   for (const object of objectsInZone) {
-    const screenPt = convertToScreenCoords(object);
-    switch (object.type) {
-      case 0:
-        console.error("Invalid type!");
-        break;
-      case 1: // Player
-        break;
-      case 2: // Battery
-        noStroke();
-        fill(255, 0, 0);
-        rect(screenPt.x, screenPt.y, 10, 20);
-        break;
-      case 3: // Star
-        noStroke();
-        fill(255, 255, 255);
-        ellipse(screenPt.x, screenPt.y, 2, 2);
-        break;
-      default:
-        console.error("Invalid type " + object.type);
-    }
+    object.draw();
   }
   return objectsInZone;
 }
 
 function checkCollisions(objectsInZone) {
   for (const object of objectsInZone) {
-    switch (object.type) {
-      case 2: // Battery
-        if (me.hits(object.x, object.y)) {
-          me.shieldSize += 10;
-          map.remove(object);
-        }
-        break;
+    if (object instanceof Battery) {
+      if (me.intersects(...object.extents())) {
+        me.radius += 5;
+        map.remove(object);
+      }
+    } else if (object instanceof Player) {
+      me.checkPlayerInsersection(object);
     }
   }
 }
@@ -237,12 +306,6 @@ function movePlayer() {
   }
 }
 
-function drawPlayer(p) {
-  fill(255, 255, 255);
-  const loc = convertToScreenCoords(p);
-  ellipse(loc.x, loc.y, p.playerSize, p.playerSize);
-  p.drawShield();
-}
 
 function sum(arr) {
   return arr.reduce((t, n) => { return t + n }, 0);
