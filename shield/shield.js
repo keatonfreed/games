@@ -58,7 +58,7 @@ class Star extends MapObject {
 
 class Player extends MapObject {
   #playerSize = 20;
-  #shieldSize = 200; // Diameter!
+  #radius = 100;
   #shieldPos = 0;
   #variation = 0;
   #variationDir = true;
@@ -68,17 +68,20 @@ class Player extends MapObject {
   #shieldPatternTotal = 0;
   constructor(x, y, s) {
     super(x, y);
-    this.#shieldSize = s || this.#shieldSize;
+    this.#radius = s || this.#radius;
     this.#shieldPatternTotal = sum(this.#shieldPattern);
   }
   get playerSize() {
     return this.#playerSize;
   }
   get radius() {
-    return this.#shieldSize / 2;
+    return this.#radius;
   }
   set radius(val) {
-    this.#shieldSize = Math.max(0, val * 2);
+    this.#radius = Math.max(0, Math.min(250, val));
+  }
+  isDead() {
+    return this.radius <= this.#playerSize;
   }
 
   rotatePattern(shieldPattern, shieldShift, cw) {
@@ -148,7 +151,7 @@ class Player extends MapObject {
     if (Math.abs(this.#shieldFuzz - 0.5) >= 1) {
       this.#shieldFuzzDir = !this.#shieldFuzzDir;
     }
-    let s = this.#shieldSize + this.#variation;
+    let s = this.#radius * 2 + this.#variation;
     stroke(255, 255, 255);
     this.drawShieldRing(s - 10, this.#shieldPos, true, this.#shieldFuzz, this.#shieldPattern);
     stroke(255, 255, 255);
@@ -156,8 +159,7 @@ class Player extends MapObject {
   }
 
   draw() {
-    if (this.radius <= 0) {
-      // DEAD!
+    if (this.isDead()) {
       return;
     }
     fill(255, 255, 255);
@@ -189,15 +191,21 @@ class Player extends MapObject {
     if (!this.intersects(...p2.extents())) {
       return;
     }
+    if (this.isDead() || p2.isDead()) {
+      return;
+    }
     const d = Math.sqrt((this.x - p2.x) ** 2 + (this.y - p2.y) ** 2);
     if (d < (this.radius + p2.radius)) {
       // Intersection!
       if (this.radius > p2.radius ||
         (this.radius == p2.radius && Math.random() > 0.5)) {
-        if (p2.radius > 0) {
-          this.radius += 1;
-          p2.radius = d - this.radius;
-        }
+        // We win (either larger or randomly if equal)
+        this.radius += 0.5; // We gain 0.5
+        p2.radius = d - this.radius - 0.25; // They lose the gap, minus a bit
+      } else {
+        // We lose (they eat the gap)
+        p2.radius += 0.5; // They gain 0.5
+        this.radius = d - p2.radius - 0.25; // We lose the gap, minus a bit
       }
     }
   }
@@ -216,10 +224,12 @@ class Map {
   addObject(type, x, y) {
     const newObj = new type(x, y);
     this.#map.push(newObj);
+    return newObj;
   }
-  addRandomObjects(n, type, x, y, w, h) {
+  addRandomObjects(n, type, x, y, w, h, fn) {
+    fn = fn || (f => f);
     for (let i = 0; i < n; i++) {
-      this.addObject(type, Math.random() * w + x - w / 2, Math.random() * h + y - h / 2);
+      fn(this.addObject(type, Math.random() * w + x - w / 2, Math.random() * h + y - h / 2));
     }
   }
   getObjectsInZone(x, y, w, h) {
@@ -243,9 +253,11 @@ let viewHeight = height;
 const map = new Map();
 map.addRandomObjects(2500, Battery, 0, 0, viewWidth * 20, viewHeight * 20);
 map.addRandomObjects(100000, Star, 0, 0, viewWidth * 20, viewHeight * 20);
-map.addRandomObjects(1000, Player, 0, 0, viewWidth * 20, viewHeight * 20);
+const modSize = p => { p.radius = Math.round(Math.random() * 40 + 80); }
+map.addRandomObjects(1000, Player, 0, 0, viewWidth * 20, viewHeight * 20, modSize);
 
 const me = new Player();
+me.radius = 120;
 
 function draw() {
   background(0, 0, 0);
@@ -280,14 +292,34 @@ function drawMapZone() {
 }
 
 function checkCollisions(objectsInZone) {
-  for (const object of objectsInZone) {
+  for (let i = 0; i < objectsInZone.length; i++) {
+    const object = objectsInZone[i];
     if (object instanceof Battery) {
       if (me.intersects(...object.extents())) {
-        me.radius += 5;
+        me.radius += 0.5;
         map.remove(object);
       }
     } else if (object instanceof Player) {
+      // const r1 = me.radius;
+      // const r2 = object.radius;
       me.checkPlayerInsersection(object);
+      // if (r1 != me.radius || r2 != object.radius) {
+      //   alert(`change, me went from ${r1} to ${me.radius}, object from ${r2} to ${object.radius}`);
+      // }
+
+      // Found a player in the zone - loop through the rest of the objects
+      // to find collisions with others.
+      for (let j = i + 1; j < objectsInZone.length; j++) {
+        const otherPlayer = objectsInZone[j];
+        if (otherPlayer instanceof Player) {
+          // const r1 = object.radius;
+          // const r2 = otherPlayer.radius;
+          object.checkPlayerInsersection(otherPlayer);
+          // if (r1 != object.radius || r2 != otherPlayer.radius) {
+          //   //            alert(`after, object went from ${r1} to object.radius`);
+          // }
+        }
+      }
     }
   }
 }
@@ -366,3 +398,4 @@ window.addEventListener('keydown', function(e) {
       break;
   }
 });
+//mouseClicked = () => ();
