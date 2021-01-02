@@ -257,7 +257,7 @@ const modSize = p => { p.radius = Math.round(Math.random() * 40 + 80); }
 map.addRandomObjects(1000, Player, 0, 0, viewWidth * 20, viewHeight * 20, modSize);
 
 const me = new Player();
-me.radius = 120;
+me.radius = 100;
 
 function draw() {
   background(0, 0, 0);
