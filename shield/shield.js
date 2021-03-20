@@ -31,7 +31,7 @@ class Battery extends MapObject {
   #h = 20;
   draw() {
     noStroke();
-    fill(255, 0, 0);
+    fill(10, 247, 235);
     const pt = convertToScreenCoords(this);
     rect(pt.x, pt.y, this.#w, this.#h);
   }
